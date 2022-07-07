@@ -19,7 +19,7 @@ class Parser:
         self.address = 0
 
     def HasMoreLines(self) -> bool:
-        return len(self.lines) > self.address + 1
+        return len(self.lines) > self.address
 
     def Advance(self):
         self.current = self.lines[self.address]
@@ -51,7 +51,7 @@ class Parser:
         if self.InstructionType() == "C" and self.current.count("=") > 0:
             return self.current.split("=")[1]
         elif self.InstructionType() == "C" and self.current.count(";") > 0:
-            return self.current.split(";")[1]
+            return self.current.split(";")[0]
         else:
             return self.current
 

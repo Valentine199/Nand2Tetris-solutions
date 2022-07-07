@@ -4,7 +4,8 @@ import Code as Co
 import os
 
 # Grabs the file on the path and opens it
-path = "Add.asm"
+path = "ASM\\RectL.asm"
+
 Parser = Pa.Parser(path)
 
 # Creates the symbol table
@@ -19,6 +20,7 @@ while Parser.HasMoreLines():
         newEntry = Parser.symbol()
         if not table.Contains(newEntry):
             table.addEntry(newEntry, counter)
+            counter -= 1
 
     counter += 1
 
@@ -35,17 +37,21 @@ while Parser.HasMoreLines():
 
         # symbol is the number of the memory address
         if symbol.isdecimal():
-            output.append(int(symbol))
+            output.append(format(int(symbol), "016b"))
         elif table.Contains(symbol):
             # the symbol is in the table
-            output.append(table.GetAddress(symbol))
+            output.append(format(table.GetAddress(symbol),"016b"))
         else:
             # The symbol is not in table
-            output.append(counter)
+            output.append(format(counter, "016b"))
             table.addEntry(symbol, counter)
             counter += 1
     elif Parser.InstructionType() == "C":
         code_out = "111"
+
+        # parse comp, comp is mandatory
+        now = Parser.comp()
+        code_out += Code.comp(now)
 
         # parse dest
         now = Parser.dest()
@@ -54,26 +60,24 @@ while Parser.HasMoreLines():
         else:
             code_out += "000"
 
-        # parse comp, comp is mandatory
-        now = Parser.comp()
-        code_out += Code.comp(now)
-
         # parse jump
         now = Parser.jump()
         if now is not None:
             code_out += Code.jump(now)
         else:
             code_out += "000"
+
+        output.append(code_out)
     else:
         pass
 
 # Write the output
 current_name = os.path.basename(path)
-filename = current_name.replace(".asm", ".hack")
+filename ="HACK\\"+ current_name.replace(".asm", ".hack")
 fw = open(filename, "w")
 
 for out in output:
-    fw.write(format(out, "016b"))
+    fw.write(out)
     fw.write("\n")
 
 fw.close()
